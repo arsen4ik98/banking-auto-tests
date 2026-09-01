@@ -21,11 +21,14 @@ jobs:
           distribution: 'temurin'
           cache: maven
 
+      - name: Compile project & Download dependencies
+        run: mvn test-compile -ntp
+
       - name: Install Playwright Browsers & OS Dependencies
-        run: mvn test-compile exec:java -e -Dexec.mainClass=com.microsoft.playwright.CLI -Dexec.args="install --with-deps"
+        run: mvn exec:java -e -Dexec.mainClass=com.microsoft.playwright.CLI -Dexec.args="install --with-deps" -ntp
 
       - name: Run Maven Tests
-        run: mvn clean test
+        run: mvn test -ntp
 
       - name: Upload Allure Results as Artifact
         if: always()
