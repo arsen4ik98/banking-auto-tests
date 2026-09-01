@@ -1,0 +1,12 @@
+# Maven
+target/
+*.jar
+*.war
+
+# IntelliJ IDEA
+.idea/
+*.iml
+
+# Allure & Playwright
+allure-results/
+test-results/
