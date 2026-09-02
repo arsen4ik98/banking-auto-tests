@@ -6,8 +6,10 @@ import org.aeonbits.owner.ConfigFactory;
 import org.testng.annotations.*;
 
 public class BaseTest {
-
+    // Конфиг можно инициализировать сразу, так как он не зависит от браузера
     protected static final ProjectConfig config = ConfigFactory.create(ProjectConfig.class);
+
+    // ТОЛЬКО ОБЪЯВЛЕНИЕ ПЕРЕМЕННЫХ
     protected Playwright playwright;
     protected Browser browser;
     protected BrowserContext context;
@@ -15,8 +17,6 @@ public class BaseTest {
 
     @BeforeClass
     public void setUpClass() {
-
-
         playwright = Playwright.create();
         boolean isHeadless = System.getenv("CI") != null;
         browser = playwright.chromium().launch(new BrowserType.LaunchOptions().setHeadless(isHeadless));
@@ -24,6 +24,7 @@ public class BaseTest {
 
     @BeforeMethod
     public void setUpMethod() {
+        // Создаем изолированный контекст и страницу перед КАЖДЫМ тестом
         context = browser.newContext();
         page = context.newPage();
     }

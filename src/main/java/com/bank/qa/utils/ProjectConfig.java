@@ -11,7 +11,7 @@ public interface ProjectConfig extends Config {
     String apiBaseUrl();
 
     @Key("ui.test.username")
-    String uiBTestUsername();
+    String uiTestUsername();
 
     @Key("ui.test.password")
     String uiTestPassword();

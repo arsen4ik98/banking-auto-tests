@@ -11,28 +11,23 @@ public class LoginTest extends BaseTest {
 
     @BeforeMethod
     public void initPages() {
-        loginPage = new LoginPage(page); // Инициализируем, когда 'page' уже существует
+        // Инициализируем страницу. К этому моменту BaseTest уже создал 'page'
+        loginPage = new LoginPage(page);
     }
 
     @Test(description = "Успешная авторизация валидным пользователем")
     public void testValidLogin() {
-        LoginPage loginPage = new LoginPage(page);
         page.navigate(config.uiBaseUrl());
-        // Используем стандартные учетные данные демо-сайта
-        loginPage.login(config.uiBTestUsername(), config.uiTestPassword());
+        loginPage.login(config.uiTestUsername(), config.uiTestPassword());
 
-        // Проверяем, что URL изменился на страницу каталога
         Assert.assertEquals(page.url(), config.uiBaseUrl() + "inventory.html", "Авторизация не удалась");
     }
 
     @Test(description = "Проверка появления ошибки при неверном пароле")
     public void testInvalidLogin() {
         page.navigate(config.uiBaseUrl());
-        LoginPage loginPage = new LoginPage(page);
+        loginPage.login(config.uiTestUsername(), "wrong_password");
 
-        loginPage.login(config.uiBTestUsername(), "wrong_password");
-
-        // Проверяем, что система не пустила пользователя и выдала правильный текст ошибки
         String error = loginPage.getErrorMessage();
         Assert.assertTrue(error.contains("Username and password do not match"), "Текст ошибки не совпадает");
     }
