@@ -9,7 +9,6 @@ import org.aeonbits.owner.ConfigFactory;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-
 import static io.restassured.RestAssured.given;
 
 public class ApiAuthTest {
