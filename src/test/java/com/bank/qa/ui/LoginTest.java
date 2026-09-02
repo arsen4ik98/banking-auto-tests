@@ -3,15 +3,21 @@ package com.bank.qa.ui;
 import com.bank.qa.base.BaseTest;
 import com.bank.qa.pages.LoginPage;
 import org.testng.Assert;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 public class LoginTest extends BaseTest {
+    LoginPage loginPage;
+
+    @BeforeMethod
+    public void initPages() {
+        loginPage = new LoginPage(page); // Инициализируем, когда 'page' уже существует
+    }
 
     @Test(description = "Успешная авторизация валидным пользователем")
     public void testValidLogin() {
-        page.navigate(config.uiBaseUrl());
         LoginPage loginPage = new LoginPage(page);
-
+        page.navigate(config.uiBaseUrl());
         // Используем стандартные учетные данные демо-сайта
         loginPage.login(config.uiBTestUsername(), config.uiTestPassword());
 
