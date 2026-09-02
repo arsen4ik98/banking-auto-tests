@@ -9,22 +9,22 @@ public class LoginTest extends BaseTest {
 
     @Test(description = "Успешная авторизация валидным пользователем")
     public void testValidLogin() {
-        page.navigate("https://www.saucedemo.com/");
+        page.navigate(config.uiBaseUrl());
         LoginPage loginPage = new LoginPage(page);
 
         // Используем стандартные учетные данные демо-сайта
-        loginPage.login("standard_user", "secret_sauce");
+        loginPage.login(config.uiBTestUsername(), config.uiTestPassword());
 
         // Проверяем, что URL изменился на страницу каталога
-        Assert.assertEquals(page.url(), "https://www.saucedemo.com/inventory.html", "Авторизация не удалась");
+        Assert.assertEquals(page.url(), config.uiBaseUrl() + "inventory.html", "Авторизация не удалась");
     }
 
     @Test(description = "Проверка появления ошибки при неверном пароле")
     public void testInvalidLogin() {
-        page.navigate("https://www.saucedemo.com/");
+        page.navigate(config.uiBaseUrl());
         LoginPage loginPage = new LoginPage(page);
 
-        loginPage.login("standard_user", "wrong_password");
+        loginPage.login(config.uiBTestUsername(), "wrong_password");
 
         // Проверяем, что система не пустила пользователя и выдала правильный текст ошибки
         String error = loginPage.getErrorMessage();

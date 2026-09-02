@@ -8,7 +8,7 @@ public class FirstUITest extends BaseTest{
 
     @Test(description = "Проверка доступности главной страницы")
     public void checkMainPageTitle() {
-        page.navigate("https://www.saucedemo.com/");
+        page.navigate(config.uiBaseUrl());
         String title = page.title();
         Assert.assertEquals(title, "Swag Labs", "Заголовок страницы не совпадает");
     }

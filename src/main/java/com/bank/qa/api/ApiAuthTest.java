@@ -1,11 +1,14 @@
 package com.bank.qa.api;
 
 import com.bank.qa.models.AuthRequest;
+import com.bank.qa.utils.ProjectConfig;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
+import org.aeonbits.owner.ConfigFactory;
 import org.testng.Assert;
 import org.testng.annotations.Test;
+
 
 import static io.restassured.RestAssured.given;
 
@@ -13,14 +16,16 @@ public class ApiAuthTest {
 
     @Test(description = "Получение токена авторизации API")
     public void testSuccessfulAuthentication() {
+        ProjectConfig config = ConfigFactory.create(ProjectConfig.class);
+
         // Устанавливаем базовый URL
-        RestAssured.baseURI = "https://restful-booker.herokuapp.com";
+        RestAssured.baseURI = config.apiBaseUrl();
 
         // Создаем тело запроса с помощью Lombok Builder
 
         AuthRequest requestBody = AuthRequest.builder()
-                .username("admin")
-                .password("password123")
+                .username(config.apiTestUsername())
+                .password(config.apiTestPassword())
                 .build();
 
         String  password = requestBody.getPassword();

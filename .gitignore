@@ -8,5 +8,8 @@ target/
 *.iml
 
 # Allure & Playwright
-allure-results/
+target/allure-results/
 test-results/
+
+# Configurations and Secrets
+src/test/resources/application.properties
