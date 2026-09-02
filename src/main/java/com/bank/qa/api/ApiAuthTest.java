@@ -3,7 +3,6 @@ package com.bank.qa.api;
 import com.bank.qa.models.AuthRequest;
 import com.bank.qa.utils.ProjectConfig;
 import io.restassured.RestAssured;
-import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import org.aeonbits.owner.ConfigFactory;
 import org.testng.Assert;
@@ -31,13 +30,11 @@ public class ApiAuthTest {
 
         // Отправляем POST-запрос и сохраняем ответ
         Response response = given()
-                .contentType(ContentType.JSON)
+                .spec(ApiClient.getBaseSpec())
                 .body(requestBody) // Jackson автоматически превратит объект в JSON
-                .log().all() // Логируем запрос в консоль
                 .when()
                 .post("/auth")
                 .then()
-                .log().all() // Логируем ответ
                 .extract().response();
 
         // Проверки (Assertions)

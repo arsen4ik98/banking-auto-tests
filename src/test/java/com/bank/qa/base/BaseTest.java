@@ -1,10 +1,12 @@
 package com.bank.qa.base;
 
 import com.bank.qa.utils.ProjectConfig;
+import com.bank.qa.utils.TestListener;
 import com.microsoft.playwright.*;
 import org.aeonbits.owner.ConfigFactory;
 import org.testng.annotations.*;
 
+@Listeners(TestListener.class)
 public class BaseTest {
     // Конфиг можно инициализировать сразу, так как он не зависит от браузера
     protected static final ProjectConfig config = ConfigFactory.create(ProjectConfig.class);
@@ -38,5 +40,9 @@ public class BaseTest {
     public void tearDownClass() {
         browser.close();
         playwright.close();
+    }
+
+    public Page getPage() {
+        return page;
     }
 }
