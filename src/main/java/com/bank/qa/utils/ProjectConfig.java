@@ -2,7 +2,7 @@ package com.bank.qa.utils;
 
 import org.aeonbits.owner.Config;
 
-@Config.Sources({"classspath:application.properties"})
+@Config.Sources({"classpath:application.properties"})
 public interface ProjectConfig extends Config {
     @Key("ui.base.url")
     String uiBaseUrl();
