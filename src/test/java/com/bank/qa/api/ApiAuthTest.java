@@ -2,7 +2,6 @@ package com.bank.qa.api;
 
 import com.bank.qa.models.AuthRequest;
 import com.bank.qa.utils.ProjectConfig;
-import io.restassured.RestAssured;
 import io.restassured.response.Response;
 import org.aeonbits.owner.ConfigFactory;
 import org.testng.Assert;
@@ -16,17 +15,12 @@ public class ApiAuthTest {
     public void testSuccessfulAuthentication() {
         ProjectConfig config = ConfigFactory.create(ProjectConfig.class);
 
-        // Устанавливаем базовый URL
-        RestAssured.baseURI = config.apiBaseUrl();
-
         // Создаем тело запроса с помощью Lombok Builder
 
         AuthRequest requestBody = AuthRequest.builder()
                 .username(config.apiTestUsername())
                 .password(config.apiTestPassword())
                 .build();
-
-        String  password = requestBody.getPassword();
 
         // Отправляем POST-запрос и сохраняем ответ
         Response response = given()
@@ -44,7 +38,6 @@ public class ApiAuthTest {
         String token = response.jsonPath().getString("token");
         Assert.assertNotNull(token, "Токен не должен быть пустым");
 
-        System.out.println("Сгенерированный токен: " + token);
-        System.out.println("Сгенерированный пароль: " + password);
+        Assert.assertFalse(token.isBlank(), "Токен не должен быть пустым");
     }
 }

@@ -7,6 +7,10 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
+import java.net.URI;
+
+import static com.microsoft.playwright.assertions.PlaywrightAssertions.assertThat;
+
 public class LoginTest extends BaseTest {
     LoginPage loginPage;
 
@@ -21,7 +25,8 @@ public class LoginTest extends BaseTest {
         page.navigate(config.uiBaseUrl());
         loginPage.login(config.uiTestUsername(), config.uiTestPassword());
 
-        Assert.assertEquals(page.url(), config.uiBaseUrl() + "///inventory.html", "Авторизация не удалась");
+        String inventoryUrl = URI.create(config.uiBaseUrl()).resolve("/inventory.html").toString();
+        assertThat(page).hasURL(inventoryUrl);
     }
 
     @Test(description = "Проверка появления ошибки при неверном пароле")
@@ -37,17 +42,18 @@ public class LoginTest extends BaseTest {
     @DataProvider(name = "negativeLoginData")
     public Object[][] negativeLoginData() {
         return new Object[][] {
-                {"locked_out_user", config.uiTestPassword(), "Epic sadface: Sorry, this user has been locked out."},
-                {config.uiTestUsername(), "wrong_pass", "Epic sadface: Username and password do not match"},
-                {"", config.uiTestPassword(), "Epic sadface: Username is required"}
+                {"locked_out_user", true, "Epic sadface: Sorry, this user has been locked out."},
+                {config.uiTestUsername(), false, "Epic sadface: Username and password do not match"},
+                {"", true, "Epic sadface: Username is required"}
         };
     }
 
     // 2. Связываем тест с провайдером и передаем переменные в аргументы метода
     @Test(description = "Проверка негативных сценариев авторизации", dataProvider = "negativeLoginData")
-    public void testNegativeLoginScenarios(String username, String password, String expectedError) {
+    public void testNegativeLoginScenarios(String username, boolean useValidPassword, String expectedError) {
         page.navigate(config.uiBaseUrl());
-        loginPage.login(username, password);
+        // Не передаем пароль как параметр теста: TestNG и Allure сохраняют параметры в отчетах.
+        loginPage.login(username, useValidPassword ? config.uiTestPassword() : "wrong_pass");
 
         String actualError = loginPage.getErrorMessage();
         Assert.assertTrue(actualError.contains(expectedError),
