@@ -1,17 +1,35 @@
 package com.bank.qa.ui;
 
 import com.bank.qa.base.BaseTest;
+import com.bank.qa.ci.AiBugReporter;
 import com.bank.qa.pages.LoginPage;
+import dev.langchain4j.model.googleai.GoogleAiGeminiChatModel;
+import dev.langchain4j.service.AiServices;
+import io.qameta.allure.Allure;
 import org.testng.Assert;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.DataProvider;
-import org.testng.annotations.Test;
+import org.testng.ITestResult;
+import org.testng.annotations.*;
 
 import java.net.URI;
 
 import static com.microsoft.playwright.assertions.PlaywrightAssertions.assertThat;
 
 public class LoginTest extends BaseTest {
+
+    // Переменная для нашего агента
+    private AiBugReporter.BugAnalyzerAgent aiAgent;
+
+    @BeforeClass
+    public void setUpAi() {
+        // Инициализируем модель один раз перед запуском тестов в классе
+        GoogleAiGeminiChatModel model = GoogleAiGeminiChatModel.builder()
+                .apiKey("ТВОЙ_КЛЮЧ_ОТ_GEMINI")
+                .modelName("gemini-2.5-flash")
+                .temperature(0.0)
+                .build();
+        aiAgent = AiServices.create(AiBugReporter.BugAnalyzerAgent.class, model);
+    }
+
     LoginPage loginPage;
 
     @BeforeMethod
@@ -25,7 +43,7 @@ public class LoginTest extends BaseTest {
         page.navigate(config.uiBaseUrl());
         loginPage.login(config.uiTestUsername(), config.uiTestPassword());
 
-        String inventoryUrl = URI.create(config.uiBaseUrl()).resolve("/inventory.html").toString();
+        String inventoryUrl = URI.create(config.uiBaseUrl()).resolve("/.inventory.html").toString();
         assertThat(page).hasURL(inventoryUrl);
     }
 
@@ -41,7 +59,7 @@ public class LoginTest extends BaseTest {
     // 1. Создаем матрицу данных: Логин, Пароль, Ожидаемый текст ошибки
     @DataProvider(name = "negativeLoginData")
     public Object[][] negativeLoginData() {
-        return new Object[][] {
+        return new Object[][]{
                 {"locked_out_user", true, "Epic sadface: Sorry, this user has been locked out."},
                 {config.uiTestUsername(), false, "Epic sadface: Username and password do not match"},
                 {"", true, "Epic sadface: Username is required"}
@@ -58,5 +76,31 @@ public class LoginTest extends BaseTest {
         String actualError = loginPage.getErrorMessage();
         Assert.assertTrue(actualError.contains(expectedError),
                 String.format("Ожидалась ошибка '%s', но получили '%s'", expectedError, actualError));
+    }
+
+    @AfterMethod
+    public void attachAiReportOnFailure(ITestResult result) {
+        // Проверяем, что тест упал и есть лог ошибки
+        if (result.getStatus() == ITestResult.FAILURE && result.getThrowable() != null) {
+            System.out.println("--- 🤖 Запрашиваем AI анализ падения ---");
+
+            String stacktrace = result.getThrowable().toString();
+
+            try {
+                // Получаем ответ от Gemini
+                AiBugReporter.JiraTicket ticket = aiAgent.analyzeError(stacktrace);
+
+                String aiReport = String.format(
+                        "Summary: %s\nPriority: %s\n\nDescription:\n%s",
+                        ticket.summary(), ticket.priority(), ticket.description()
+                );
+
+                // Прикрепляем в Allure (теперь контекст точно жив!)
+                Allure.addAttachment("🧠 AI Анализ дефекта", aiReport);
+
+            } catch (Exception e) {
+                System.err.println("Не удалось получить ответ от AI: " + e.getMessage());
+            }
+        }
     }
 }

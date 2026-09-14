@@ -13,3 +13,10 @@ test-results/
 
 # Configurations and Secrets
 src/test/resources/application.properties
+
+# CI analyzer local state and credentials
+.ci-analyzer/
+.env
+.env.*
+!.env.example
+config/ci-owners.properties
