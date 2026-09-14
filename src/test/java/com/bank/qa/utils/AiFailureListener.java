@@ -13,13 +13,19 @@ public class AiFailureListener implements ITestListener {
     private final AiBugReporter.BugAnalyzerAgent agent;
 
     public AiFailureListener() {
+
+        String apiKey = System.getenv("AIzaSyCvYmswd_Y4mNL2KO-ptrASjZeaEKYCo84");
+
+        if (apiKey == null || apiKey.isEmpty()) {
+            throw new RuntimeException("API ключ не найден! Установите переменную окружения GEMINI_API_KEY");
+        }
         // Если Gemini работает через прокси, раскомментируй эти 2 строки:
         System.setProperty("https.proxyHost", "127.0.0.1");
         System.setProperty("https.proxyPort", "10808");
 
         // Инициализируем модель один раз при старте тестов
         GoogleAiGeminiChatModel model = GoogleAiGeminiChatModel.builder()
-                .apiKey("AIzaSyCvYmswd_Y4mNL2KO-ptrASjZeaEKYCo84")
+                .apiKey(apiKey)
                 .modelName("gemini-2.5-flash")
                 .temperature(0.0)
                 .build();

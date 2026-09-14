@@ -26,13 +26,19 @@ public class AiBugReporter {
     public static void main(String[] args) {
         // Подключение к OpenAI
 
+        String apiKey = System.getenv("AIzaSyCvYmswd_Y4mNL2KO-ptrASjZeaEKYCo84");
+
+        if (apiKey == null || apiKey.isEmpty()) {
+            throw new RuntimeException("API ключ не найден! Установите переменную окружения GEMINI_API_KEY");
+        }
+
         // Укажите тип прокси (HTTP или SOCKS) и порт вашего локального клиента.
 // Обычно для локальных клиентов (Shadowsocks, v2ray, Outline) это 1080, 10808 или 8080.
         System.setProperty("https.proxyHost", "127.0.0.1");
         System.setProperty("https.proxyPort", "10808");
 
         GoogleAiGeminiChatModel model = GoogleAiGeminiChatModel.builder()
-                .apiKey("AIzaSyCvYmswd_Y4mNL2KO-ptrASjZeaEKYCo84")
+                .apiKey(apiKey)
                 .modelName("gemini-2.5-flash")
                 .temperature(0.0)
                 .build();
